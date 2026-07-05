@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Biga Pizza Calculator</title>
+    <style>
+        /* CSS Variables for easy theme switching */
+        :root {
+            --bg-color: #f7f9fa;
+            --container-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #555555;
+            --text-subtle: #666666;
+            --border-color: #ccd1d9;
+            --border-dashed: #edf1f7;
+            --primary-color: #e65100;
+            --primary-hover: #bf360c;
+            --alert-bg: #fff3e0;
+            --alert-border: #ffb74d;
+            --schedule-bg: #e3f2fd;
+            --schedule-border: #29b6f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #b0bec5;
+            --text-subtle: #90a4ae;
+            --border-color: #424242;
+            --border-dashed: #2d2d2d;
+            --primary-color: #ff7043;
+            --primary-hover: #f4511e;
+            --alert-bg: #2e1c0c;
+            --alert-border: #b86200;
+            --schedule-bg: #0d233a;
+            --schedule-border: #0288d1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 550px;
+            width: 100%;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        
+        /* Theme Toggle Button Styling */
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: auto;
+            margin: 0;
+            transition: all 0.2s;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--border-dashed);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            margin-top: 10px;
+            font-size: 1.8rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            background-color: var(--container-bg);
+            color: var(--text-main);
+        }
+        .calc-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 15px;
+        }
+        .calc-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .results {
+            margin-top: 25px;
+            border-top: 2px solid var(--border-color);
+            padding-top: 15px;
+            display: none;
+        }
+        h2 {
+            color: var(--text-main);
+            font-size: 1.15rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 4px;
+            margin-top: 22px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px dashed var(--border-dashed);
+            font-size: 0.95rem;
+        }
+        .highlight {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .alert-box {
+            background-color: var(--alert-bg);
+            border-left: 4px solid var(--alert-border);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .schedule-box {
+            background-color: var(--schedule-bg);
+            border-left: 4px solid var(--schedule-border);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+
+    <h1>Pro Biga Pizza Calculator</h1>
+    
+    <div class="grid">
+        <div class="input-group">
+            <label for="doughWeight">Total Dough Weight (g):</label>
+            <input type="number" id="doughWeight" value="1000">
+        </div>
+        <div class="input-group">
+            <label for="totalHydration">Total Hydration (%):</label>
+            <input type="number" id="totalHydration" value="65" min="55" max="85">
+        </div>
+        <div class="input-group">
+            <label for="saltPercent">Salt (% of Flour):</label>
+            <input type="number" id="saltPercent" value="2.5" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="bigaFlourPercent">Flour in Biga (%):</label>
+            <input type="number" id="bigaFlourPercent" value="100" min="20" max="100">
+        </div>
+
+        <div class="input-group">
+            <label for="roomTemp">Your Room Temp (°C):</label>
+            <input type="number" id="roomTemp" value="22" step="0.5">
+        </div>
+        <div class="input-group">
+            <label for="targetHours">Desired Ferment Time (hrs):</label>
+            <select id="targetHours">
+                <option value="16">16 Hours (Standard)</option>
+                <option value="24">24 Hours (More Flavor)</option>
+                <option value="48">48 Hours (Advanced Long)</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculateProDough()">Calculate Dynamic Recipe</button>
+
+    <div id="results" class="results">
+        
+        <h2>1. The Water Temperature Rule</h2>
+        <div class="result-row">
+            <span>Target Biga Mix Temp:</span>
+            <span>19°C – 21°C</span>
+        </div>
+        <div class="result-row">
+            <span>Use Biga Water At:</span>
+            <span id="calcWaterTemp" class="highlight" style="color: #0288d1;">0°C</span>
+        </div>
+        <div class="alert-box" id="tempAdvice"></div>
+
+        <h2>2. The Biga Schedule & Formula</h2>
+        <div id="scheduleAdvice" class="schedule-box"></div>
+        
+        <div class="result-row">
+            <span>Biga Flour:</span>
+            <span id="bigaFlour" class="highlight">0 g</span>
+        </div>
+        <div class="result-row">
+            <span>Biga Water (44%):</span>
+            <span id="bigaWater" class="highlight">0 g</span>
+        </div>
+        <div class="result-row">
+            <span>Instant Dry Yeast (IDY):</span>
+            <span id="bigaYeast" class="highlight">0 g</span>
+        </div>
+
+        <h2>3. Main Dough Refreshment</h2>
+        <div class="result-row">
+            <span>Remaining Flour:</span>
+            <span id="remFlour" class="highlight">0 g</span>
+        </div>
+        <div class="result-row">
+            <span>Remaining Water:</span>
+            <span id="remWater" class="highlight">0 g</span>
+        </div>
+        <div class="result-row">
+            <span>Salt:</span>
+            <span id="salt" class="highlight">0 g</span>
+        </div>
+        
+        <h2>Totals Check</h2>
+        <div class="result-row">
+            <span>Total Flour / Water:</span>
+            <span id="totals">0g / 0g</span>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- Theme Handling Logic ---
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    let newTheme = 'light';
+    
+    if (currentTheme !== 'dark') {
+        newTheme = 'dark';
+    }
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateToggleBtnText(newTheme);
+}
+
+function updateToggleBtnText(theme) {
+    const btn = document.getElementById('themeToggle');
+    btn.innerText = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+// Load saved theme on startup
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+updateToggleBtnText(savedTheme);
+
+
+// --- Pizza Calculator Logic ---
+function calculateProDough() {
+    const totalDoughWeight = parseFloat(document.getElementById('doughWeight').value);
+    const totalHydrationPercent = parseFloat(document.getElementById('totalHydration').value) / 100;
+    const saltPercent = parseFloat(document.getElementById('saltPercent').value) / 100;
+    const bigaFlourPercent = parseFloat(document.getElementById('bigaFlourPercent').value) / 100;
+    const roomTemp = parseFloat(document.getElementById('roomTemp').value);
+    const targetHours = parseInt(document.getElementById('targetHours').value);
+
+    const bigaHydrationPercent = 0.44; 
+    
+    let yeastPercent = 0.01; 
+    if (targetHours === 24) yeastPercent = 0.008; 
+    if (targetHours === 48) yeastPercent = 0.005; 
+
+    const totalFlour = totalDoughWeight / (1 + totalHydrationPercent + saltPercent + (bigaFlourPercent * yeastPercent));
+    const totalWater = totalFlour * totalHydrationPercent;
+    const totalSalt = totalFlour * saltPercent;
+
+    const bigaFlour = totalFlour * bigaFlourPercent;
+    const bigaWater = bigaFlour * bigaHydrationPercent;
+    const bigaYeast = bigaFlour * yeastPercent;
+
+    const remainingFlour = totalFlour - bigaFlour;
+    const remainingWater = totalWater - bigaWater;
+
+    let calculatedWaterTemp = 55 - (roomTemp + roomTemp);
+    if(calculatedWaterTemp < 4) calculatedWaterTemp = 4; 
+
+    let scheduleText = "";
+    let tempText = "";
+
+    if (roomTemp <= 19) {
+        scheduleText = `Your room is nice and cool (${roomTemp}°C). Ferment the Biga entirely at <strong>Room Temperature</strong> for the full ${targetHours} hours.`;
+        tempText = "Standard cool tap water is fine.";
+    } else {
+        let rtHours = 2;
+        let fridgeHours = targetHours - rtHours;
+        
+        scheduleText = `Kitchen is warm (${roomTemp}°C). Use <strong>Split Fermentation</strong> to prevent over-acidification: Leave Biga out at room temp for <strong>${rtHours} hours</strong> to kickstart yeast, then move to your refrigerator (4°C) for the remaining <strong>${fridgeHours} hours</strong>.`;
+        tempText = "Your kitchen is warm. Use ice water or chilled water from the fridge to reach the target mix temp.";
+    }
+
+    if (targetHours === 48) {
+        scheduleText = `For an advanced 48-hour build: Ferment at Room Temp for 2-3 hours, then store in the refrigerator for 45 hours. Bring out 1 hour before mixing the final dough.`;
+    }
+
+    document.getElementById('calcWaterTemp').innerText = calculatedWaterTemp.toFixed(1) + " °C";
+    document.getElementById('tempAdvice').innerText = tempText;
+    document.getElementById('scheduleAdvice').innerHTML = scheduleText;
+
+    document.getElementById('bigaFlour').innerText = bigaFlour.toFixed(1) + ' g';
+    document.getElementById('bigaWater').innerText = bigaWater.toFixed(1) + ' g';
+    document.getElementById('bigaYeast').innerText = bigaYeast.toFixed(1) + ' g';
+    
+    document.getElementById('remFlour').innerText = remainingFlour.toFixed(1) + ' g';
+    document.getElementById('remWater').innerText = remainingWater.toFixed(1) + ' g';
+    document.getElementById('salt').innerText = totalSalt.toFixed(1) + ' g';
+    
+    document.getElementById('totals').innerText = totalFlour.toFixed(0) + 'g / ' + totalWater.toFixed(0) + 'g';
+
+    document.getElementById('results').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
